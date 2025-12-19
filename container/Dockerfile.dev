@@ -11,14 +11,12 @@ ARG USER_GID=$USER_UID
 
 # Looks like we need a USER 0 here
 USER 0
-# Clone art-tools and run install.sh script
-RUN cd art-tools \
- && git pull \
- && ./install.sh
 
-# Install dependencies from requirements.txt
+# Install project requirements
+WORKDIR /workspaces/art-bot
+
 COPY requirements.txt requirements-dev.txt ./
-RUN pip3 install --upgrade -r requirements.txt -r requirements-dev.txt
+RUN uv pip install --upgrade -r requirements.txt -r requirements-dev.txt
 
 # install art-bot and default configs
 COPY container/krb5-redhat.conf /etc/krb5.conf
