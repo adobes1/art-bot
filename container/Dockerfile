@@ -59,12 +59,14 @@ WORKDIR /workspaces/art-bot
 # Set non-root user
 USER "$USER_UID"
 
-# Create a virtual environment
-RUN python3.11 -m venv venv \
-  # upgrade pip
-  && /workspaces/art-bot/venv/bin/python -m pip install --upgrade pip
+# Install uv
+RUN wget -qO- https://astral.sh/uv/install.sh | sh
+ENV PATH="/home/$USERNAME/.local/bin/:$PATH"
 
-# Clone art-tools and install dependencies
-RUN git clone https://github.com/openshift-eng/art-tools.git art-tools \
- && cd art-tools \
- && /workspaces/art-bot/venv/bin/python -m pip install artcommon/ -e doozer/ -e elliott/ -e pyartcd/ -e ocp-build-data-validator/ \
+# Create a virtual environment
+RUN uv venv venv --python 3.11
+ENV VIRTUAL_ENV=/workspaces/art-bot/venv
+ENV PATH="$VIRTUAL_ENV/bin:$PATH"
+
+# Upgrade pip
+RUN uv pip install --upgrade pip
